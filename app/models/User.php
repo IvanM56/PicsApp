@@ -1,202 +1,233 @@
 <?php
 
-class User {
+namespace App\Models;
 
-    private $db;
-
-    public function __construct(){
-
-        $this->db = new DB;
-
-    }
+use PDO;
 
 
+class User extends \Core\DB {
 
-    public function find_by_username($username){
 
-        $this->db->query('SELECT * FROM users WHERE username = :username');
-        $this->db->bind(':username', $username);
+    public static function getAll(){
 
-        $row = $this->db->getSingle();
+        try {
 
-        if ($this->db->rowCount() > 0) {
-            
-            return true;
+            $db = static::getDB();
+            $stmt = $db->query('SELECT * FROM users ORDER BY created_at');
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-        } else {
+            return $results;
 
-            return false;
-
+        } catch (PDOException $e) {
+            echo $e->getMessage();
         }
     }
-    public function find_by_email($email){
 
-        $this->db->query('SELECT * FROM users WHERE email = :email');
-        $this->db->bind(':email', $email);
+ 
+    public static function find_by_username($username){
 
-        $row = $this->db->getSingle();
+        $db = static::getDB();
 
-        if ($this->db->rowCount() > 0) {
-            
+        $stmt = $db->prepare('SELECT * FROM users WHERE username = :username');
+        $stmt->bindValue(':username', $username);
+        $stmt->execute();
+
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if ($row) {
             return true;
-            
         } else {
-
             return false;
-
         }
 
     }
 
-    public function register($data){
+    public static function find_by_email($email){
 
-        $this->db->query('INSERT INTO users (username, email, password, profile_img) VALUES (:username, :email, :password, :profile_img)');
-        $this->db->bind(':username', $data['username']);
-        $this->db->bind(':email', $data['email']);
-        $this->db->bind(':password', $data['password']);
-        $this->db->bind(':profile_img', $data['profile_img']);
-        $this->db->execute();
+        $db = static::getDB();
+
+        $stmt = $db->prepare('SELECT * FROM users WHERE email = :email');
+        $stmt->bindValue(':email', $email);
+        $stmt->execute();
+
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if ($row) {
+            return true;
+        } else {
+            return false;    
+        }
 
     }
 
-    public function login($data){
+    public static function register($data){
 
-        $this->db->query('SELECT * FROM users WHERE email = :email');
-        $this->db->bind(':email', $data['email']);
+        $db = static::getDB();
 
-        $row = $this->db->getSingle();
+        $stmt = $db->prepare('INSERT INTO users (username, email, password, profile_img) VALUES (:username, :email, :password, :profile_img)');
+        $stmt->bindValue(':username', $data['username']);
+        $stmt->bindValue(':email', $data['email']);
+        $stmt->bindValue(':password', $data['password']);
+        $stmt->bindValue(':profile_img', $data['profile_img']);
+        $stmt->execute();
+
+    }
+
+    public static function login($data){
+
+        $db = static::getDB();
+
+        $stmt = $db->prepare('SELECT * FROM users WHERE email = :email');
+        $stmt->bindValue(':email', $data['email']);
+        $stmt->execute();
+
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
 
         $hashpass = $row->password;
 
         if (password_verify($data['password'], $hashpass)){
-
             return $row;
-
         } else {
-
             return false;
-
         }
         
     }
 
+
     public function get_user($id){
 
-        $this->db->query('SELECT * FROM users WHERE id = :id');
-        $this->db->bind(':id', $id);
-        $this->db->execute();
+        $db = static::getDB();
 
-        $row = $this->db->getSingle();
+        $stmt = $db->prepare('SELECT * FROM users WHERE id = :id');
+        $stmt->bindValue(':id', $id);
+        $stmt->execute();
 
-        if ($this->db->rowCount() > 0) {
-            
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if ($stmt->rowCount() > 0) {
             return $row;
-
         } else {
-
             return false;
-
         }
     }
 
     public function get_user_and_pics($id){
 
-        $this->db->query('SELECT u.id, u.username, u.email, u.profile_img, i.user_id, i.img_name 
+        $db = static::getDB();
+
+        $stmt = $db->prepare('SELECT u.id, u.username, u.email, u.profile_img, i.user_id, i.img_name 
                             FROM users u JOIN images i ON u.id = i.user_id WHERE u.id = :id');
-        $this->db->bind(':id', $id);
-        $this->db->execute();
+        $stmt->bindValue(':id', $id);
+        $stmt->execute();
 
-        $rows = $this->db->getAll();
-
-        if ($this->db->rowCount() > 0) {
-            
-            return $rows;
-
-        } else {
         
-            return false;
 
+
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        if ($stmt->rowCount() > 0) {      
+            return $rows;
+        } else {   
+            return false;
         }
 
     }
 
-    public function get_user_and_pic_count($id){
+    /*public function get_user_and_pic_count($id){
 
-        $this->db->query('SELECT u.id, u.username, u.email, u.profile_img, COUNT(i.user_id) as pic_count 
+        $db = static::getDB();
+
+        $stmt = $db->prepare('SELECT u.id, u.username, u.email, u.profile_img, COUNT(i.user_id) as pic_count 
                             FROM users u 
                                 JOIN images i ON i.user_id = u.id 
                                     WHERE i.user_id = :id 
                                         GROUP BY u.username');  // probati bez group by; ionako se dohvaća samo jedan rezultat preko $id-a
-        $this->db->bind(':id', $id);
-        $this->db->execute();
-        
-        return $this->db->getSingle();
+        $stmt->bindValue(':id', $id);
+        $stmt->execute();
 
-    }
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if ($stmt->rowCount() > 0) {
+            return $row;
+        } else {
+            return false;
+        }
+
+    }*/
+
 
     public function update($data){
 
-        $this->db->query('UPDATE users SET username = :username, email = :email, profile_img = :profile_img WHERE id = :id');
-        $this->db->bind(':username', $data['username']);
-        $this->db->bind(':email', $data['email']);
-        $this->db->bind(':profile_img', $data['profile_img']);
-        $this->db->bind(':id', $data['id']);
-        $this->db->execute();
+        $db = static::getDB();
+
+        $stmt = $db->prepare('UPDATE users SET username = :username, email = :email, profile_img = :profile_img WHERE id = :id');
+        $stmt->bindValue(':username', $data['username']);
+        $stmt->bindValue(':email', $data['email']);
+        $stmt->bindValue(':profile_img', $data['profile_img']);
+        $stmt->bindValue(':id', $data['id']);
+        $stmt->execute();
 
     }
 
     public function insert_token($email, $token){
 
-        $this->db->query('UPDATE users SET token = :token, token_expires = DATE_ADD(NOW(), INTERVAL 5 MINUTE) WHERE email = :email');
-        $this->db->bind(':token', $token);
+        $db = static::getDB();
+
+        $stmt = $db->prepare('UPDATE users SET token = :token, token_expires = DATE_ADD(NOW(), INTERVAL 5 MINUTE) WHERE email = :email');
+        $stmt->bindValue(':token', $token);
         //$this->db->bind(':token_expires', DATE_ADD(NOW(), INTERVAL 5 MINUTE));
-        $this->db->bind(':email', $email);
-        $this->db->execute();
+        $stmt->bindValue(':email', $email);
+        $stmt->execute();
 
     }
 
     public function delete_token($email, $token){
 
-        $this->db->query("UPDATE users SET token = '' WHERE email = :email");
-        $this->db->bind(':email', $email);
-        $this->db->execute();
+        $db = static::getDB();
+
+        $stmt = $db->prepare("UPDATE users SET token = '' WHERE email = :email");
+        $stmt->bindValue(':email', $email);
+        $stmt->execute();
         
     }
 
     public function find_by_email_and_token($email, $token){
 
-        $this->db->query("SELECT * FROM users WHERE email = :email AND token = :token AND token != '' AND token_expires > NOW()");
-        $this->db->bind(':email', $email);
-        $this->db->bind(':token', $token);
+        $db = static::getDB();
 
-        $row = $this->db->getSingle();
+        $stmt = $db->prepare("SELECT * FROM users WHERE email = :email AND token = :token AND token != '' AND token_expires > NOW()");
+        $stmt->bindValue(':email', $email);
+        $stmt->bindValue(':token', $token);
+        $stmt->execute();
 
-        if ($this->db->rowCount() > 0) {
-            
-            return true;
-            
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if ($stmt->rowCount() > 0) {    
+            return true;         
         } else {
-
             return false;
-
         }
 
     }
 
-    public function update_password($data){
+    public function update_password($data){ 
 
-        $this->db->query("UPDATE users SET password = :password, token = '' WHERE email = :email");
-        $this->db->bind(':password', $data['password']);
-        $this->db->bind(':email', $data['email']);
-        $this->db->execute();
+        $db = static::getDB();
+
+        $stmt = $db->prepare("UPDATE users SET password = :password, token = '' WHERE email = :email");
+        $stmt->bindValue(':password', $data['password']);
+        $stmt->bindValue(':email', $data['email']);
+        $stmt->execute();
 
     }
 
     public function delete_profile($id){
 
-        $this->db->query('DELETE FROM users WHERE id = :id');
-        $this->db->bind(':id', $id);
-        $this->db->execute();
+        $db = static::getDB();
+
+        $stmt = $db->prepare('DELETE FROM users WHERE id = :id');
+        $stmt->bindValue(':id', $id);
+        $stmt->execute();
 
     }
 

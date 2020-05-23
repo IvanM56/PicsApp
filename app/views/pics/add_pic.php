@@ -1,7 +1,7 @@
 <?php require '../app/views/layouts/header.php'; ?>
 
 
-<div class="ml-5 mt-4">
+<div class="ml-5 mt-4"> 
     <div class="row">
         <form action="" method="POST" enctype="multipart/form-data">
             <div class="form-group">

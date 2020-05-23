@@ -1,4 +1,10 @@
-<?php require '../app/views/layouts/header.php'; ?>
+<?php 
+
+require '../app/views/layouts/header.php';
+
+use App\Config; 
+
+?>
 
 
 <div class="row">
@@ -6,7 +12,7 @@
     <div class="card card-body bg-light mt-5">
         <h2>Login</h2>
         <p>Please fill in your credentials to log in</p>
-        <form action="" method="POST">
+        <form action="<?php echo Config::ROOTURL; ?>users/login" method="POST">
             <input type="hidden" name="csrf_token" value="<?php echo $data['csrf_token']; ?>">
             <div class="form-group">
                 <label for="email">Email: <sup>*</sup></label>
@@ -29,13 +35,13 @@
                     <input type="submit" name="submit" value="Login" class="btn btn-success btn-block">
                 </div>
                 <div class="col">
-                    <a href="<?php echo register(); ?>" class="btn btn-light btn-block">Need an account? Well, register!</a>
+                    <a href="<?php echo Config::ROOTURL; ?>users/register" class="btn btn-light btn-block">Need an account? Well, register!</a>
                 </div>
             </div><br>
         </form>   
             <div class="form-group">
                 <small class="text-muted ml-2">
-                    <a href="<?php echo home(); ?>users/send_email" style="float:right">Forgot Password?</a>
+                    <a href="<?php echo Config::ROOTURL; ?>users/send-email" style="float:right">Forgot Password?</a>
                 </small>
             </div>
     </div>

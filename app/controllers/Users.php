@@ -1,19 +1,28 @@
 <?php
 
-use PHPMailer\PhpMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\SMTP;
+namespace App\Controllers;
 
-require_once 'Pics.php';
+use \Core\View;
+use App\Models\User;
+use App\Helpers\CsrfToken;
+use App\Config;
+use PHPMailer\PHPMailer;
+use PHPMailer\Exception;
+use PHPMailer\SMTP;
 
-class Users extends Controller {
+
+class Users extends \Core\Controller {
 
 
-    public function __construct(){
+    public function index(){
 
-        $this->user_model = $this->model('User');
+        $users = User::getAll();
+        View::render('Users/index', [
+            'users' => $users
+        ]);
 
     }
+
 
     public function register(){
 
@@ -23,7 +32,7 @@ class Users extends Controller {
                 
                 $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
-                Pics::add_profile_img();
+                Pics::addProfileImg();
                 $profile_img = Pics::$new_name;
 
                 $data = [
@@ -42,13 +51,14 @@ class Users extends Controller {
                 
                 ];
 
+
                 if (empty($data['username'])) {
                     
                     $data['username_error'] = 'Please enter your username';
                 
                 } else {
 
-                    if($this->user_model->find_by_username($data['username'])){
+                    if(User::find_by_username($data['username'])){
 
                         $data['username_error'] = 'This username is already taken';
 
@@ -62,7 +72,7 @@ class Users extends Controller {
 
                 } else {
 
-                    if($this->user_model->find_by_email($data['email'])){
+                    if(User::find_by_email($data['email'])){
 
                         $data['email_error'] = 'This email is already in use!';
 
@@ -106,7 +116,7 @@ class Users extends Controller {
                     
                     $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 
-                    $this->user_model->register($data);
+                    User::register($data);
                 
                     $_SESSION['profile_img'] = $profile_img;
 
@@ -114,7 +124,9 @@ class Users extends Controller {
                 
                 } else {
                 
-                    $this->view('users/register', $data);
+                    View::render('users/register', [
+                        'data' => $data
+                    ]);
                     
                 }
 
@@ -136,7 +148,9 @@ class Users extends Controller {
             
             ];
 
-            $this->view('users/register', $data);
+            View::render('users/register', [
+                'data' => $data
+            ]);
   
         }
 
@@ -146,8 +160,9 @@ class Users extends Controller {
     public function login(){
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
+            
             if (CsrfToken::check($_POST['csrf_token'])){
+
 
                 $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
                 
@@ -167,7 +182,7 @@ class Users extends Controller {
                     
                 } else {
 
-                    if($this->user_model->find_by_email($data['email'])){
+                    if(User::find_by_email($data['email'])){
 
                         // mail je u bazi, user se može ulogirati
 
@@ -189,7 +204,7 @@ class Users extends Controller {
                 
                 if (empty($data['email_error']) && empty($data['password_error'])) {
                     
-                    $user = $this->user_model->login($data);
+                    $user = User::login($data);
                 
                     if($user){
 
@@ -218,20 +233,23 @@ class Users extends Controller {
 
                     } else {
 
-                        $data['password_error'] = 'You have entered wrong password, my boy!';
-                        $this->view('users/login', $data);
+                        $data['password_error'] = 'You have entered wrong password!';
+                        View::render('users/login', [
+                            'data' => $data
+                        ]);
 
                     }
                 
                 } else {
                 
-                    $this->view('users/login', $data);
+                    View::render('users/login', [
+                        'data' => $data
+                    ]);
                     
                 }
 
             }
 
-        
         } else {
         
             $data = [
@@ -244,13 +262,16 @@ class Users extends Controller {
             
             ];
             
-            $this->view('users/login', $data);
+            View::render('users/login', [
+                'data' => $data
+            ]);
         
         }
 
     }
 
-    public function send_email(){
+
+    public function sendEmail(){
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -271,30 +292,30 @@ class Users extends Controller {
                 ];
     
                 $email = $data['email'];
-                $user = $this->user_model->find_by_email($email);
+                $user = User::find_by_email($email);
     
                 if($user){
     
                     $token = random_string();
     
-                    $this->user_model->insert_token($email, $token);
+                    User::insert_token($email, $token);
     
-                    require_once '../app/PHPMailer/PHPMailer.php';
+                    /*require_once '../app/PHPMailer/PHPMailer.php';
                     require_once '../app/PHPMailer/Exception.php';
-                    require_once '../app/PHPMailer/SMTP.php';
+                    require_once '../app/PHPMailer/SMTP.php';*/
     
                     $mail = new PHPMailer;
     
-                    // Server
+                    /* Server */
                     //$mail->SMTPDebug = 4;                      
                     $mail->isSMTP();                                            
                     $mail->Host       = 'smtp.gmail.com';                    
                     $mail->SMTPAuth   = true;                                   
-                    $mail->Username   = EMAIL;                     
-                    $mail->Password   = PASSWORD;                               
+                    $mail->Username   = Config::EMAIL_ADDRESS;                     
+                    $mail->Password   = Config::EMAIL_PASSWORD;                               
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;       
                     $mail->Port       = 587;     
-                    // Email
+                    /* Email */
                     $mail->addAddress($email);
                     $mail->setFrom('no_reply@picsapp.com','PicsApp');
                     $mail->Subject = 'Reset Password';
@@ -305,8 +326,8 @@ class Users extends Controller {
                 
                         click on the link below to reset your password.<br><br>
 
-                        <a href='http://localhost:8080/picsapp_mvc/users/reset_password?email=$email&token=$token'>
-                        http://localhost:8080/picsapp_mvc/users/reset_password?email=$email&token=$token</a><br><br>
+                        <a href='http://localhost:8080/mvc_udemy_picsapp/users/reset-password?email=$email&token=$token'>
+                        http://localhost:8080/mvc_udemy_picsapp/users/reset-password?email=$email&token=$token</a><br><br>
 
                         Regards,<br> 
                         PicApp
@@ -317,7 +338,9 @@ class Users extends Controller {
                         
                         $data['email_msg'] = 'We\'ve sent you an email. Check your inbox!';
                         
-                        $this->view('users/send_email', $data);
+                        View::render('users/send_email', [
+                            'data' => $data
+                        ]);
 
                     } else {
                     
@@ -329,7 +352,9 @@ class Users extends Controller {
     
                     $data['email_msg'] = 'Can\'t find this email in the base!';
 
-                    $this->view('users/send_email', $data);
+                    View::render('users/send_email', [
+                        'data' => $data
+                    ]);
     
                 }
 
@@ -345,15 +370,16 @@ class Users extends Controller {
 
             ];
 
-            return $this->view('users/send_email', $data);
+            return View::render('users/send_email', [
+                'data' => $data
+            ]);
 
         }
-
-        
+   
     }
 
 
-    public function reset_password(){
+    public function resetPassword(){
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -362,7 +388,7 @@ class Users extends Controller {
             $email = $_COOKIE['email'];
             $token = $_COOKIE['token'];
 
-            if ($this->user_model->find_by_email_and_token($email, $token)){
+            if (user::find_by_email_and_token($email, $token)){
                 
                 $data = [
 
@@ -405,7 +431,7 @@ class Users extends Controller {
 
                     $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 
-                    $this->user_model->update_password($data);  
+                    User::update_password($data);  
                 
                     unset($_COOKIE['email']);
                     unset($_COOKIE['token']);
@@ -414,17 +440,19 @@ class Users extends Controller {
 
                 } else {
 
-                    return $this->view('users/reset_password', $data);
+                    return View::render('users/reset_password', [
+                        'data' => $data
+                    ]);
 
                 }
 
             } else {
 
                 // flash('Invalid or expired token!');
-                $this->user_model->delete_token($email, $token);
+                User::delete_token($email, $token);
                 unset($_COOKIE['email']);
                 unset($_COOKIE['token']);
-                return $this->view('users/send_email');
+                return View::render('users/send_email');
 
             }
 
@@ -433,14 +461,16 @@ class Users extends Controller {
             $email = $_GET['email'];
             $token = $_GET['token'];
 
-            if($this->user_model->find_by_email_and_token($email, $token)){
+            if(User::find_by_email_and_token($email, $token)){
 
                 setcookie('email', $email);
                 setcookie('token', $token);
 
                 $data = ['csrf_token' => CsrfToken::create()];
 
-                return $this->view('users/reset_password', $data);
+                return View::render('users/reset_password', [
+                    'data' => $data
+                ]);
 
             } else {
 
@@ -457,9 +487,11 @@ class Users extends Controller {
     }
 
 
-    public function profile($id){
+    public function profile(){
 
-        $user = $this->user_model->get_user_and_pic_count($id);
+        $id = $this->route_params['id'];
+       
+        $user = User::get_user($id);
 
         $data = [
 
@@ -470,13 +502,16 @@ class Users extends Controller {
 
         ];
 
-        return $this->view('users/profile', $data);
+        return View::render('users/profile', [
+            'data' => $data
+        ]);
 
     }
 
 
-    public function edit_profile($id){
-        
+    public function editProfile(){
+
+        $id = $this->route_params['id'];
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -484,11 +519,11 @@ class Users extends Controller {
 
                 $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
-                $user = $this->user_model->get_user($id);
+                $user = User::get_user($id);
                 
                 if (isset($_FILES)) {
 
-                    Pics::upd_profile_img($user->profile_img);
+                    Pics::updProfileImg($user->profile_img);
                     $profile_img = Pics::$new_name;
 
                 } 
@@ -520,7 +555,7 @@ class Users extends Controller {
                     
                 } else {
     
-                    if($this->user_model->find_by_email($data['email'])){
+                    if(User::find_by_email($data['email'])){
     
                         if($data['email'] == $user->email){
     
@@ -544,7 +579,7 @@ class Users extends Controller {
     
                 if (empty($data['username_error']) && empty($data['email_error']) && empty($data['profile_img_error'])) {
                     
-                    $this->user_model->update($data);
+                    User::update($data);
 
                     $_SESSION['username'] = $data['username'];
                     $_SESSION['profile_img'] = $profile_img;      
@@ -553,7 +588,9 @@ class Users extends Controller {
 
                 } else {
     
-                    $this->view('users/edit_profile', $data);
+                    View::render('users/edit_profile', [
+                        'data' => $data
+                    ]);
     
                 }
 
@@ -561,7 +598,7 @@ class Users extends Controller {
 
         } else {
 
-            $user = $this->user_model->get_user($id);
+            $user = User::get_user($id);
 
             if($user->id != $_SESSION['id']){
 
@@ -582,52 +619,49 @@ class Users extends Controller {
         
                 ];
                 
-                return $this->view('users/edit_profile', $data);
+                return View::render('users/edit_profile', [
+                    'data' => $data
+                ]);
 
             }
             
-
         }
 
     }
 
+    public function deleteProfile(){
 
-
-    public function delete_profile($id){
-
-        // prvo treba provjeriti ima li user uopće ikakvu fotku u bazi
-        // ako nema ide DELETE iz users tablice
-        // ako ima ide DELETE users JOIN images
-        // al prvo treba iz storagea maknuti fotke
-        // i onda iz baze
-
-        if ($id !== $_SESSION['id']) {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
-            redirect('home');
+            $id = $_POST['userId'];
 
-        } else {
-
-            $user_data = $this->user_model->get_user_and_pics($id);
-
-            foreach ($user_data as $key => $value) {
+            if ($id !== $_SESSION['id']) {
                 
-                if ($value->profile_img != 'default.jpg') {
+                redirect('home');
+    
+            } else {
+    
+                $user_data = User::get_user_and_pics($id);
+    
+                foreach ($user_data as $key => $value) {
                     
-                    unlink('../public/assets/img/profile_pics/'. $value->profile_img);
-
+                    if ($value->profile_img != 'default.jpg') {
+                        
+                        unlink('../public/img/profile_pics/'. $value->profile_img);
+    
+                    }
+    
+                    unlink('../public/img/'. $value->img_name);
+                   
                 }
+    
+                User::delete_profile($id);
+    
+                $this->logout();
+    
+            } 
 
-                unlink('../public/assets/img/'. $value->img_name);
-               
-            }
-
-            $this->user_model->delete_profile($id);
-
-            $this->logout();
-
-        }
-        
-        
+        }    
 
     }
 
@@ -642,5 +676,4 @@ class Users extends Controller {
         redirect('home');
     
     }
-
 }

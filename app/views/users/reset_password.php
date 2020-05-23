@@ -1,11 +1,17 @@
-<?php require '../app/views/layouts/header.php'; ?>
+<?php 
+
+require '../app/views/layouts/header.php'; 
+
+use App\Config; 
+
+?>
 
 
 <div class="row">
   <div class="col-md-12 ml-5">
     <div class="card card-body bg-light mt-5">
         <h2>Enter your new password</h2><br>
-        <form action="<?php echo home() ?>users/reset_password" method="POST">
+        <form action="<?php echo Config::ROOTURL; ?>users/reset-password" method="POST">
             <input type="hidden" name="csrf_token" value="<?php echo $data['csrf_token']; ?>">
             <div class="form-group">
                 <label for="password">Password: <sup>*</sup></label>
@@ -24,7 +30,7 @@
                     <input type="submit" name="submit" value="Reset password" class="btn btn-success btn-block">
                 </div>
                 <div class="col">
-                    <a href="<?php echo login(); ?>" class="btn btn-info btn-block">Go back</a>
+                    <a href="<?php echo Config::ROOTURL; ?>users/login" class="btn btn-info btn-block">Go back</a>
                 </div>
             </div><br>
         </form>   

@@ -1,7 +1,9 @@
 <?php 
 
 require '../app/views/layouts/header.php'; 
+require '../App/Views/Users/delete_profile_modal.php';
 
+use App\Config;
 
 ?>
 
@@ -10,9 +12,9 @@ require '../app/views/layouts/header.php';
     <div class="card card-body bg-light mt-5">
         <h2>Change your data</h2><br>
         <div class="media">
-            <img class="rounded-circle" src="<?php echo STORAGE; ?>img/profile_pics/<?php echo ($data['profile_img'] != 'default.jpg') ? $data['profile_img'] : 'default.jpg'; ?>" width="200" height="200">
+            <img class="rounded-circle" src="<?php echo Config::STORAGE; ?>profile_pics/<?php echo ($data['profile_img'] != 'default.jpg') ? $data['profile_img'] : 'default.jpg'; ?>" width="200" height="200">
         </div><br>
-        <form action="<?php echo home() ?>users/edit_profile/<?php echo $data['id']; ?>" method="POST" enctype="multipart/form-data">
+        <form action="<?php echo Config::ROOTURL; ?>users/edit-profile/<?php echo $data['id']; ?>" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="<?php echo $data['csrf_token']; ?>">
             <div class="form-group">
                 <input type="file" class="form-control-file form-control-sm 
@@ -31,12 +33,13 @@ require '../app/views/layouts/header.php';
                 <?php echo(!empty($data['email_error'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['email']; ?>">
                 <span class="invalid-feedback"><?php echo $data['email_error']; ?></span>
             </div>
-            <div class="row">
+            <div class="row mt-4">
                 <div class="col">
                     <input type="submit" name="submit" value="Update" class="btn btn-success btn-block">
                 </div>
                 <div class="col">
-                    <a href="<?php echo home(); ?>users/delete_profile/<?php echo $data['id']; ?>" class="btn btn-danger btn-block">Delete profile?</a>
+                    <a href="#" id="delProfile" class="btn btn-danger float-right" data-id="<?php echo $data['id']; ?>" >Delete profile?</a>
+                    <!-- <a href="<?php echo Config::ROOTURL; ?>users/delete-profile/<?php ?>" class="btn btn-danger btn-block">Delete profile?</a> -->
                 </div>
             </div>
         </form>

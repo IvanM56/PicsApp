@@ -1,32 +1,50 @@
 <?php
 
-class Pic {
+namespace App\Models;
 
-    private $db;
+use PDO;
 
-    public function __construct(){
+class Pic extends \Core\DB {
 
-        $this->db = new DB;
+    public static function getAll(){ 
 
+        try {
+
+            $db = static::getDB();
+            $stmt = $db->query('SELECT i.id, i.user_id, i.img_name, i.uploaded_at, u.username, u.profile_img 
+                                    FROM images i JOIN users u ON i.user_id = u.id 
+                                        ORDER BY created_at');
+
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            return $results;
+
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
     }
 
     public function all_pics(){
 
-        $this->db->query('SELECT i.id, i.user_id, i.img_name, i.uploaded_at, u.username, u.profile_img 
+        $db = static::getDB();
+
+        $stmt = $db->query('SELECT i.id, i.user_id, i.img_name, i.uploaded_at, u.username, u.profile_img 
                             FROM images i JOIN users u ON i.user_id = u.id
                                 ORDER BY i.uploaded_at DESC');
         
-        return $this->db->getAll();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
 
     }
 
     public function user_pics($user_id){
 
-        $this->db->query('SELECT i.id, i.user_id, i.img_name, u.username FROM images i JOIN users u ON i.user_id = u.id WHERE i.user_id = :id');
-        $this->db->bind(':id', $user_id);
-        $this->db->execute();
+        $db = static::getDB();
+        
+        $stmt = $db->prepare('SELECT i.id, i.user_id, i.img_name, i.uploaded_at, u.username FROM images i JOIN users u ON i.user_id = u.id WHERE i.user_id = :id');
+        $stmt->bindValue(':id', $user_id);
+        $stmt->execute();
 
-        $rows = $this->db->getAll();
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         return $rows;
 
@@ -34,38 +52,48 @@ class Pic {
 
     public function add_pic($user_id, $img_name){
 
-        $this->db->query('INSERT INTO images (user_id, img_name) VALUES (:id, :img_name)');
-        $this->db->bind(':id', $user_id);
-        $this->db->bind(':img_name', $img_name);
-        $this->db->execute();
+        $db = static::getDB();
+
+        $stmt = $db->prepare('INSERT INTO images (user_id, img_name) VALUES (:id, :img_name)');
+        $stmt->bindValue(':id', $user_id);
+        $stmt->bindValue(':img_name', $img_name);
+        $stmt->execute();
+
+        $stmt = $db->prepare('UPDATE users SET pic_count = pic_count+1 WHERE id = :id');
+        $stmt->bindValue(':id', $user_id);
+        $stmt->execute();
 
     }
 
-    public function get_img($img_id){
+    public function get_pic($pic_id){
 
-        $this->db->query('SELECT * FROM images WHERE id = :id');
-        $this->db->bind(':id', $img_id);
-        $this->db->execute();
+        $db = static::getDB();
 
-        $row = $this->db->getSingle();
+        $stmt = $db->prepare('SELECT * FROM images WHERE id = :id'); 
+        $stmt->bindValue(':id', $pic_id);
+        $stmt->execute();
 
-        if ($this->db->rowCount() > 0) {
-            
+        $row = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if ($stmt->rowCount() > 0) {    
             return $row;
-
-        } else {
-            
+        } else {          
             return false;
-
         }
 
     }
 
-    public function delete_pic($img_id){
+    public function delete_pic($pic_id, $user_id){
 
-        $this->db->query('DELETE FROM images WHERE id = :id');
-        $this->db->bind(':id', $img_id);
-        $this->db->execute();
+        $db = static::getDB();
+
+        $stmt = $db->prepare('DELETE FROM images WHERE id = :id');
+        $stmt->bindValue(':id', $pic_id);
+        $stmt->execute();
+
+        $stmt = $db->prepare('UPDATE users SET pic_count = pic_count-1 WHERE id = :id ');
+        $stmt->bindValue(':id', $user_id);
+        $stmt->execute();
 
     }
 

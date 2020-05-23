@@ -1,13 +1,11 @@
 <?php
 
-
+namespace App\Helpers;
 
 class CsrfToken {
 
 
     public static function create(){
-
-        //$token = bin2hex(random_bytes(24));
 
         $token = random_string();
 

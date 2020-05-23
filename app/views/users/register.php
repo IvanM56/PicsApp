@@ -1,5 +1,11 @@
 
-<?php require '../app/views/layouts/header.php'; ?>
+<?php 
+
+require '../app/views/layouts/header.php'; 
+
+use App\Config;
+
+?>
 
 
 <div class="row">
@@ -8,9 +14,9 @@
         <h2>Create an account</h2>
         <p>Please fill out this form to register with us</p>
         <div class="media">
-            <img class="rounded-circle" src="<?php echo STORAGE; ?>/img/profile_pics/default.jpg" width="200" height="200">
+            <img class="rounded-circle" src="<?php echo Config::STORAGE; ?>profile_pics/default.jpg" width="200" height="200">
         </div><br>
-        <form action="<?php echo home()?>users/register" method="POST" enctype="multipart/form-data">
+        <form action="<?php echo Config::ROOTURL; ?>users/register" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="<?php echo $data['csrf_token']; ?>">
             <div class="form-group">
                 <input type="file" class="form-control-file form-control-sm 
@@ -47,7 +53,7 @@
                     <input type="submit" name="submit" value="Register" class="btn btn-success btn-block">
                 </div>
                 <div class="col">
-                    <a href="<?php echo login(); ?>" class="btn btn-light btn-block">Already have an account? Login!</a>
+                    <a href="<?php echo Config::ROOTURL; ?>users/login" class="btn btn-light btn-block">Already have an account? Login!</a>
                 </div>
             </div>
         </form>

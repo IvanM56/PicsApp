@@ -1,21 +1,32 @@
 <?php
 
-class Pics extends Controller {
+namespace App\Controllers;
+
+use \Core\View;
+use App\Models\Pic;
+
+
+class Pics extends \Core\Controller {
 
 
     public static $new_name;
 
 
-    public function __construct(){
+    public function index(){
 
-        $this->pics_model = $this->model('Pic');
+        echo 'Hello from Pics controller';
+        echo '<p>Route parameters: <pre>' .
+                htmlspecialchars(print_r($this->route_params, true)) . '</pre></p>';
+                echo $this->route_params['id'];
 
     }
 
 
-   public function user_pics($user_id){
+   public function userPics(){
 
-        $pics = $this->pics_model->user_pics($user_id);
+        $user_id = $this->route_params['id'];
+
+        $pics = Pic::user_pics($user_id);
 
         $data = [
 
@@ -23,17 +34,19 @@ class Pics extends Controller {
 
         ];
 
-        $this->view('pics/user_pics', $data);
+        View::render('pics/user_pics', [
+            'data' => $data
+        ]);
 
    }
 
-   public function add_pic(){
+   public function addPic(){
 
         if(logged_in()){
 
             if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-                $upload_path = '../public/assets/img/';
+                $upload_path = '../public/img/';
             
                 $filename = $_FILES['pic']['name'];
                 $tmpname = $_FILES['pic']['tmp_name'];
@@ -54,7 +67,7 @@ class Pics extends Controller {
                 
                         move_uploaded_file($tmpname, $destfile);
     
-                        $this->pics_model->add_pic($_SESSION['id'], $new_name);
+                        Pic::add_pic($_SESSION['id'], $new_name);
     
                         redirect('home');
     
@@ -62,7 +75,9 @@ class Pics extends Controller {
     
                         $data = ['pic_error' => 'Only .jpg and .png, sorry!'];
     
-                        $this->view('pics/add_pic', $data);
+                        View::render('pics/add_pic', [
+                            'data' => $data
+                        ]);
     
                     }  
             
@@ -70,15 +85,15 @@ class Pics extends Controller {
             
                     $data = ['pic_error' => 'Choose some file to upload!'];
     
-                    $this->view('pics/add_pic', $data);
+                    View::render('pics/add_pic', [
+                        'data' => $data
+                    ]);
             
                 }
             
-                // header("Location: show_user.php");
-            
             } else {
     
-                return $this->view('pics/add_pic');
+                return View::render('pics/add_pic');
     
             } 
 
@@ -91,9 +106,9 @@ class Pics extends Controller {
  
    }
 
-   static function add_profile_img(){
+   static function addProfileImg(){
         
-        $upload_path = '../public/assets/img/profile_pics/';
+        $upload_path = '../public/img/profile_pics/';
     
         $filename = $_FILES['profile_pic']['name'];
         $tmpname = $_FILES['profile_pic']['tmp_name'];
@@ -124,9 +139,9 @@ class Pics extends Controller {
 
    }
 
-   static function upd_profile_img($img){
+   static function updProfileImg($img){
 
-        $upload_path = '../public/assets/img/profile_pics/';
+        $upload_path = '../public/img/profile_pics/';
 
         $filename = $_FILES['upd_profile_pic']['name'];
         $tmpname = $_FILES['upd_profile_pic']['tmp_name'];
@@ -147,7 +162,7 @@ class Pics extends Controller {
 
                 if($img != 'default.jpg'){
 
-                    unlink('../public/assets/img/profile_pics/'. $img);
+                    unlink('../public/img/profile_pics/'. $img);
         
                 }
 
@@ -163,34 +178,39 @@ class Pics extends Controller {
 
     }
 
-   public function remove_pic($id){
+   public function removePic(){
 
-        $pic = $this->pics_model->get_img($id);
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-        if ($pic->user_id != $_SESSION['id']) {
-            
-            redirect('home');
+            $id = $_POST['picId'];
+          
+             // $id = $this->route_params['id'];
 
-        } else {
+            $pic = Pic::get_pic($id);
 
-            if ($pic) {
-    
-                // Remove from storage
-                unlink('../public/assets/img/'. $pic->img_name);
-    
+            if ($pic->user_id != $_SESSION['id']) {
+                
+                redirect('home');
+
             } else {
-    
-                echo 'Something went wrong!';
-    
-            }
-    
-            // Delete from database
-            $this->pics_model->delete_pic($id);
-            
-            redirect('home');
 
-        }     
+                if ($pic) {
+                    // Remove from storage
+                    unlink('../public/img/'. $pic->img_name);
         
-   }
+                } else {
+        
+                    echo 'Something went wrong!';
+        
+                }
+                // Delete from database
+                Pic::delete_pic($id, $_SESSION['id']);
+                
+                redirect('home');
+
+            }
+        }
+        
+    }
 
 }
