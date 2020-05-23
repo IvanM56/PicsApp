@@ -6,21 +6,21 @@ namespace App;
 class Config {
 
     /* DATABASE */
-    const DB_HOST = 'localhost';
-    const DB_NAME = 'picsapp';
-    const DB_USER = 'root';
+    const DB_HOST = '';
+    const DB_NAME = '';
+    const DB_USER = '';
     const DB_PASS = '';
 
 
     /* STORAGE */
-    const STORAGE = 'http://localhost:8080/mvc_udemy_picsapp/public/img/';
+    const STORAGE = '';
 
 
     /* URLROOT */
-    const ROOTURL = 'http://localhost:8080/mvc_udemy_picsapp/';
+    const ROOTURL = '';
 
     /* MAIL */
-    const EMAIL_ADDRESS = 'ivan.miocic2@gmail.com';
-    const EMAIL_PASSWORD = 'gecko2okceg';
+    const EMAIL_ADDRESS = '';
+    const EMAIL_PASSWORD = '';
     
 }
