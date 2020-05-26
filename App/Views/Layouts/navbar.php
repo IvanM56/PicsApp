@@ -1,4 +1,10 @@
-<?php use App\Config; ?>
+<?php 
+
+require '../App/Views/Pics/add_pic_modal.php';
+
+use App\Config; 
+
+?>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-info">
     <a class="navbar-brand ml-3" href="<?php echo Config::ROOTURL; ?>">PicsApp</a>
@@ -37,7 +43,8 @@
           </a>
           <ul class="dropdown-menu">
             <li class="dropdown-item"> <a href="<?php echo Config::ROOTURL; ?>users/profile/<?php echo $_SESSION['id']; ?>">View profile</a> </li>
-            <li class="dropdown-item"> <a href="<?php echo Config::ROOTURL; ?>pics/add-pic">Add new pic</a> </li>
+            <li class="dropdown-item"> <a href="#" id="add-pic-modal" data-toggle="modal" data-target="#add-pic-modal">Add new pic</a></li>
+            <li class="dropdown-item"> <a href="#" id="" data-toggle="" data-target="">Add new doc</a></li>
             <li class="dropdown-item"> <a href="<?php echo Config::ROOTURL; ?>users/edit-profile/<?php echo $_SESSION['id']; ?>">Edit profile</a> </li>
             <li class="dropdown-item"> <a href="<?php echo Config::ROOTURL; ?>users/logout">Logout</a> </li>
           </ul>

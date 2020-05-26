@@ -38,7 +38,8 @@ use App\Config;
                     <input type="submit" name="submit" value="Update" class="btn btn-success btn-block">
                 </div>
                 <div class="col">
-                    <a href="#" id="delProfile" class="btn btn-danger float-right" data-id="<?php echo $data['id']; ?>" >Delete profile?</a>
+                    <a href="#" id="delProfile" class="btn btn-danger float-right" data-id="<?php echo $data['id']; ?>" 
+                    data-toggle="modal" data-target="#delete-profile-modal">Delete profile?</a>
                     <!-- <a href="<?php echo Config::ROOTURL; ?>users/delete-profile/<?php ?>" class="btn btn-danger btn-block">Delete profile?</a> -->
                 </div>
             </div>

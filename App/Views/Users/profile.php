@@ -15,7 +15,8 @@ use App\Config;
         </div><br><br>
         <label for="username">Userame: <?php echo $data['username']; ?></label>
         <label for="email">Email: <?php echo $data['email']; ?></label> 
-        <label for="username">Nr. of pics: <?php echo $data['pic_count']; ?></label>      
+        <label for="username">Nr. of pics: <?php echo $data['pic_count']; ?></label>  
+        <label for="username">Nr. of docs: <?php  ?></label>     
     </div><br>
     <a href="<?php echo Config::ROOTURL; ?>" class="btn btn-outline-info btn-block">Home</a>
   </div>   

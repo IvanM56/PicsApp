@@ -51,60 +51,79 @@ class Pics extends \Core\Controller {
                 $filename = $_FILES['pic']['name'];
                 $tmpname = $_FILES['pic']['tmp_name'];
                 $error = $_FILES['pic']['error'];
-                $size = $_FILES['pic']['size'];
-                
+                $size = $_FILES['pic']['size'];  
+
                 if ($error == UPLOAD_ERR_OK && $size != 0 && $size <= 5242880) {
-            
+
                     $path = pathinfo($filename);
                     $ext = strtolower($path['extension']);
+                    $new_name = time(). '.' .$ext;
+                    $valid_extentions = ['jpg', 'jpeg', 'png'];
     
-                    $valid_ext = ['jpg', 'jpeg', 'png'];
-    
-                    if (in_array($ext, $valid_ext)) {
-                        
-                        $new_name = time(). '.' .$ext;
-                        $destfile = $upload_path.$new_name;
-                
-                        move_uploaded_file($tmpname, $destfile);
-    
+                    if (in_array($ext, $valid_extentions)) {
+                         
+                        /* RESIZE */
+
+                        $image_properties = getimagesize($tmpname);
+                        $img_type = $image_properties[2];
+
+                        switch ($img_type) {
+                            case IMAGETYPE_JPEG:
+                                $original_img = imagecreatefromjpeg($tmpname);
+                                $tmp = $this->resizeImg($original_img, $image_properties[0], $image_properties[1], '700');
+                                imagejpeg($tmp, $upload_path.$new_name);
+
+                                //move_uploaded_file($tmpname, $upload_path.$new_name);
+                                break;
+                            
+                            case IMAGETYPE_PNG:
+                                $original_img = imagecreatefrompng($tmpname);
+                                $resized_img = $this->resizeImg($original_img, $image_properties[0], $image_properties[1], '700');
+                                imagepng($resized_img, $upload_path.$new_name);
+
+                                //move_uploaded_file($tmpname, $upload_path.$new_name);
+                                break;
+
+                        }
+
+                        /* RESIZE ENDS */
+
                         Pic::add_pic($_SESSION['id'], $new_name);
     
                         redirect('home');
     
                     } else {
-    
-                        $data = ['pic_error' => 'Only .jpg and .png, sorry!'];
-    
-                        View::render('pics/add_pic', [
-                            'data' => $data
-                        ]);
-    
+                        redirect('home');
                     }  
             
-                } else {
-            
-                    $data = ['pic_error' => 'Choose some file to upload!'];
-    
-                    View::render('pics/add_pic', [
-                        'data' => $data
-                    ]);
-            
-                }
-            
-            } else {
-    
-                return View::render('pics/add_pic');
-    
+                } else {   
+                    redirect('home');
+                }  
             } 
 
         } else {
-
             redirect('home');
-
-        }
-          
- 
+        }       
    }
+
+   public function resizeImg($original_img, $original_width, $original_height, $max_res){
+
+        $ratio = $max_res / $original_width;
+        $new_width = $max_res;
+        $new_height = $original_height * $ratio;
+
+        if ($new_height > $max_res) {
+            $ratio = $max_res / $original_height;
+            $new_height = $max_res;
+            $new_width = $original_width * $ratio;
+        }
+        
+        $new_img = imagecreatetruecolor($new_width, $new_height);
+        imagecopyresampled($new_img, $original_img, 0, 0, 0, 0, $new_width, $new_height, $original_width, $original_height);
+
+        return $new_img;
+    }
+
 
    static function addProfileImg(){
         

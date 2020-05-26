@@ -3,7 +3,7 @@
 use App\Config;
 
 
-function redirect($url){
+function redirect($url){ 
 
     if($url === 'home'){
 

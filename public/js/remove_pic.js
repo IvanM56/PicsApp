@@ -7,7 +7,7 @@ $(document).ready(function(){
         var picId = $(this).data('id');
 
         $('.modal-footer #picId').val(picId);
-        $('#remove-pic-modal').modal('toggle');
+        //$('#remove-pic-modal').modal('toggle');
     })
 });
 
@@ -20,7 +20,7 @@ $(document).ready(function(){
         var userId = $(this).data('id');
 
         $('.modal-footer #userId').val(userId);
-        $('#delete-profile-modal').modal('toggle');
+        //$('#delete-profile-modal').modal('toggle');
     })
 });
 
