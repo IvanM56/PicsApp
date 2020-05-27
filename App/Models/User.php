@@ -62,7 +62,7 @@ class User extends \Core\DB {
 
     public static function register($data){
 
-        $db = static::getDB();
+        $db = static::getDB(); 
 
         $stmt = $db->prepare('INSERT INTO users (username, email, password, profile_img) VALUES (:username, :email, :password, :profile_img)');
         $stmt->bindValue(':username', $data['username']);

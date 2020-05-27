@@ -1,14 +1,46 @@
 <?php
 
-session_start();
+namespace App\Helpers;
 
-function session($user){
 
-    $_SESSION['id'] = $user->id;
-    $_SESSION['email'] = $user->email;
-    $_SESSION['username'] = $user->username;
-    $_SESSION['profile_img'] = $user->profile_img;
+class Session {
+
+
+    public static function set($key, $value){
+
+        return $_SESSION[$key] = $value;
     
-    redirect('home');
+    }
+
+    public static function get($key){
+
+        return $_SESSION[$key];
+
+    }
+
+    public static function exists($key){
+
+        if (isset($_SESSION[$key])) {
+            
+            return true;
+
+        } else {
+
+            return false;
+
+        }
+
+    }
+
+    public static function delete($key){
+
+        if (self::exists($key)) {
+            
+            unset($_SESSION[$key]);
+
+        }
+    }
 
 }
+
+

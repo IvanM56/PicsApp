@@ -3,6 +3,7 @@
 require '../App/Views/Pics/add_pic_modal.php';
 
 use App\Config; 
+use App\Helpers\Session;
 
 ?>
 
@@ -24,7 +25,7 @@ use App\Config;
       </ul>
     <!-- Right side of the navbar -->
       <ul class="navbar-nav ml-auto">
-      <?php if(!isset($_SESSION['id'])) : ?>
+      <?php if(!Session::exists('id')) : ?>
         <li class="nav-item">
           <a class="nav-link" href="<?php echo Config::ROOTURL; ?>users/register">Register</a>
         </li>
@@ -33,19 +34,19 @@ use App\Config;
         </li> 
       <?php else : ?>
         <li class="nav-item mr-3">
-          <img class="rounded-circle" src="<?php echo Config::STORAGE; ?>profile_pics/<?php echo $_SESSION['profile_img']; ?>" width="40" height="40">
+          <img class="rounded-circle" src="<?php echo Config::STORAGE; ?>profile_pics/<?php echo Session::get('profile_img'); ?>" width="40" height="40">
         </li>
 
         <li class="dropdown">
           <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button">
-            <span class="glyphicon glyphicon-user"><?php echo $_SESSION['username']; ?></span>
+            <span class="glyphicon glyphicon-user"><?php echo Session::get('username'); ?></span>
             <span class="carret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li class="dropdown-item"> <a href="<?php echo Config::ROOTURL; ?>users/profile/<?php echo $_SESSION['id']; ?>">View profile</a> </li>
+            <li class="dropdown-item"> <a href="<?php echo Config::ROOTURL; ?>users/profile/<?php echo Session::get('id'); ?>">View profile</a> </li>
             <li class="dropdown-item"> <a href="#" id="add-pic-modal" data-toggle="modal" data-target="#add-pic-modal">Add new pic</a></li>
             <li class="dropdown-item"> <a href="#" id="" data-toggle="" data-target="">Add new doc</a></li>
-            <li class="dropdown-item"> <a href="<?php echo Config::ROOTURL; ?>users/edit-profile/<?php echo $_SESSION['id']; ?>">Edit profile</a> </li>
+            <li class="dropdown-item"> <a href="<?php echo Config::ROOTURL; ?>users/edit-profile/<?php echo Session::get('id'); ?>">Edit profile</a> </li>
             <li class="dropdown-item"> <a href="<?php echo Config::ROOTURL; ?>users/logout">Logout</a> </li>
           </ul>
         </li>

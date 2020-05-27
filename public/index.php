@@ -2,11 +2,7 @@
 
 // entry point, tzv. front controller
 
-// ovo zawrapati u klasu
-require_once '../App/Helpers/functions.php';
-require_once '../App/Helpers/session.php';
-require_once '../App/Helpers/CsrfToken.php';  
-
+session_start();
 
 
 /* AUTOLOAD CLASSES */

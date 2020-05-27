@@ -8,7 +8,10 @@ use App\Helpers\CsrfToken;
 use App\Config;
 use PHPMailer\PHPMailer;
 use PHPMailer\Exception;
-use PHPMailer\SMTP;
+use PHPMailer\SMTP; 
+use App\Helpers\Redirect;
+use App\Helpers\Session;
+use App\Helpers\RandomString;
 
 
 class Users extends \Core\Controller {
@@ -120,7 +123,7 @@ class Users extends \Core\Controller {
                 
                     $_SESSION['profile_img'] = $profile_img;
 
-                    redirect('users/login');
+                    Redirect::to('users/login');
                 
                 } else {
                 
@@ -229,7 +232,12 @@ class Users extends \Core\Controller {
                         
                         }
 
-                        session($user); 
+                        Session::set('id', $user->id);
+                        Session::set('email', $user->email);
+                        Session::set('username', $user->username);
+                        Session::set('profile_img', $user->profile_img);
+
+                        Redirect::to('home');
 
                     } else {
 
@@ -275,9 +283,6 @@ class Users extends \Core\Controller {
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            //$password = PASSWORD;
-            //$email = EMAIL;
-
             if (CsrfToken::check($_POST['csrf_token'])){
 
                 $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
@@ -296,13 +301,9 @@ class Users extends \Core\Controller {
     
                 if($user){
     
-                    $token = random_string();
+                    $token = RandomString::create();
     
                     User::insert_token($email, $token);
-    
-                    /*require_once '../app/PHPMailer/PHPMailer.php';
-                    require_once '../app/PHPMailer/Exception.php';
-                    require_once '../app/PHPMailer/SMTP.php';*/
     
                     $mail = new PHPMailer;
     
@@ -388,7 +389,7 @@ class Users extends \Core\Controller {
             $email = $_COOKIE['email'];
             $token = $_COOKIE['token'];
 
-            if (user::find_by_email_and_token($email, $token)){
+            if (User::find_by_email_and_token($email, $token)){
                 
                 $data = [
 
@@ -436,7 +437,7 @@ class Users extends \Core\Controller {
                     unset($_COOKIE['email']);
                     unset($_COOKIE['token']);
 
-                    redirect('users/login');
+                    Recirect::to('users/login');
 
                 } else {
 
@@ -474,13 +475,13 @@ class Users extends \Core\Controller {
 
             } else {
 
-                redirect('home');
+                Redirect::to('home');
 
             }
 
         } else {
 
-            redirect('home');
+            Redirect::to('home');
 
         }
 
@@ -581,10 +582,10 @@ class Users extends \Core\Controller {
                     
                     User::update($data);
 
-                    $_SESSION['username'] = $data['username'];
-                    $_SESSION['profile_img'] = $profile_img;      
+                    Session::set('username', $data['username']);
+                    Session::set('profile_img', $data['profile_img']);         
 
-                    redirect('users/profile/'. $id);
+                    Redirect::to('users/profile/'. $id);
 
                 } else {
     
@@ -600,9 +601,9 @@ class Users extends \Core\Controller {
 
             $user = User::get_user($id);
 
-            if($user->id != $_SESSION['id']){
+            if($user->id != Session::get('id')){
 
-                redirect('home');
+                Redirect::to('home');
 
             } else {
 
@@ -635,9 +636,9 @@ class Users extends \Core\Controller {
             
             $id = $_POST['userId'];
 
-            if ($id !== $_SESSION['id']) {
+            if ($id !== Session::get('id')) {
                 
-                redirect('home');
+                Redirect::to('home');
     
             } else {
     
@@ -665,15 +666,29 @@ class Users extends \Core\Controller {
 
     }
 
+    public static function loggedIn(){
+
+        if (Session::exists('id')) {
+            
+            return true;
+
+        } else {
+
+            return false;
+
+        }
+
+    }
+
     public function logout(){
     
-        unset($_SESSION['id']);
-        unset($_SESSION['email']);
-        unset($_SESSION['username']);
+        Session::delete('id');
+        Session::delete('email');
+        Session::delete('username');
     
         session_destroy();
     
-        redirect('home');
+        Redirect::to('home');
     
     }
 }

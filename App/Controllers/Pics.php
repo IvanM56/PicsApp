@@ -4,6 +4,9 @@ namespace App\Controllers;
 
 use \Core\View;
 use App\Models\Pic;
+use App\Controllers\Users;
+use App\Helpers\Redirect;
+use App\Helpers\Session;
 
 
 class Pics extends \Core\Controller {
@@ -42,7 +45,7 @@ class Pics extends \Core\Controller {
 
    public function addPic(){
 
-        if(logged_in()){
+        if(Users::loggedIn()){
 
             if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
@@ -88,21 +91,21 @@ class Pics extends \Core\Controller {
 
                         /* RESIZE ENDS */
 
-                        Pic::add_pic($_SESSION['id'], $new_name);
+                        Pic::add_pic(Session::get('id'), $new_name);
     
-                        redirect('home');
+                        Redirect::to('home');
     
                     } else {
-                        redirect('home');
+                        Redirect::to('home');
                     }  
             
                 } else {   
-                    redirect('home');
+                    Redirect::to('home');
                 }  
             } 
 
         } else {
-            redirect('home');
+            Redirect::to('home');
         }       
    }
 
@@ -207,9 +210,9 @@ class Pics extends \Core\Controller {
 
             $pic = Pic::get_pic($id);
 
-            if ($pic->user_id != $_SESSION['id']) {
+            if ($pic->user_id != Session::get('id')) {
                 
-                redirect('home');
+                Redirect::to('home');
 
             } else {
 
@@ -223,9 +226,9 @@ class Pics extends \Core\Controller {
         
                 }
                 // Delete from database
-                Pic::delete_pic($id, $_SESSION['id']);
+                Pic::delete_pic($id, Session::get('id'));
                 
-                redirect('home');
+                Redirect::to('home');
 
             }
         }
