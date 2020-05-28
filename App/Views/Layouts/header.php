@@ -17,7 +17,7 @@
     <!-- Custom CSS -->
     <!-- <link href="public/css/style.css" rel="stylesheet"> -->
 
-    <title>PicsApp</title>
+    <title>Pics&Docs</title>
 </head>
 
 <body>
