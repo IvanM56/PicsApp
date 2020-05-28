@@ -21,115 +21,150 @@ class User extends \Core\DB {
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
+        
     }
 
  
     public static function find_by_username($username){
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare('SELECT * FROM users WHERE username = :username');
-        $stmt->bindValue(':username', $username);
-        $stmt->execute();
+            $stmt = $db->prepare('SELECT * FROM users WHERE username = :username');
+            $stmt->bindValue(':username', $username);
+            $stmt->execute();
 
-        $row = $stmt->fetch(PDO::FETCH_OBJ);
+            $row = $stmt->fetch(PDO::FETCH_OBJ);
 
-        if ($row) {
-            return true;
-        } else {
-            return false;
+            if ($row) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (PDOException $e) {
+            echo $e->getMessage();
         }
-
+        
     }
 
     public static function find_by_email($email){
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare('SELECT * FROM users WHERE email = :email');
-        $stmt->bindValue(':email', $email);
-        $stmt->execute();
+            $stmt = $db->prepare('SELECT * FROM users WHERE email = :email');
+            $stmt->bindValue(':email', $email);
+            $stmt->execute();
 
-        $row = $stmt->fetch(PDO::FETCH_OBJ);
+            $row = $stmt->fetch(PDO::FETCH_OBJ);
 
-        if ($row) {
-            return true;
-        } else {
-            return false;    
-        }
+            if ($row) {
+                return true;
+            } else {
+                return false;    
+            }
+
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }   
 
     }
 
     public static function register($data){
 
-        $db = static::getDB(); 
+        try {
+            
+            $db = static::getDB(); 
 
-        $stmt = $db->prepare('INSERT INTO users (username, email, password, profile_img) VALUES (:username, :email, :password, :profile_img)');
-        $stmt->bindValue(':username', $data['username']);
-        $stmt->bindValue(':email', $data['email']);
-        $stmt->bindValue(':password', $data['password']);
-        $stmt->bindValue(':profile_img', $data['profile_img']);
-        $stmt->execute();
+            $stmt = $db->prepare('INSERT INTO users (username, email, password, profile_img) VALUES (:username, :email, :password, :profile_img)');
+            $stmt->bindValue(':username', $data['username']);
+            $stmt->bindValue(':email', $data['email']);
+            $stmt->bindValue(':password', $data['password']);
+            $stmt->bindValue(':profile_img', $data['profile_img']);
+            $stmt->execute();
 
+        } catch (PDOExceptio $e) {
+            echo $e->getMessage();
+        }
+        
     }
 
     public static function login($data){
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare('SELECT * FROM users WHERE email = :email');
-        $stmt->bindValue(':email', $data['email']);
-        $stmt->execute();
+            $stmt = $db->prepare('SELECT * FROM users WHERE email = :email');
+            $stmt->bindValue(':email', $data['email']);
+            $stmt->execute();
 
-        $row = $stmt->fetch(PDO::FETCH_OBJ);
+            $row = $stmt->fetch(PDO::FETCH_OBJ);
 
-        $hashpass = $row->password;
+            $hashpass = $row->password;
 
-        if (password_verify($data['password'], $hashpass)){
-            return $row;
-        } else {
-            return false;
-        }
+            if (password_verify($data['password'], $hashpass)){
+                return $row;
+            } else {
+                return false;
+            }
+
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }       
         
     }
 
 
     public function get_user($id){
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare('SELECT * FROM users WHERE id = :id');
-        $stmt->bindValue(':id', $id);
-        $stmt->execute();
+            $stmt = $db->prepare('SELECT * FROM users WHERE id = :id');
+            $stmt->bindValue(':id', $id);
+            $stmt->execute();
 
-        $row = $stmt->fetch(PDO::FETCH_OBJ);
+            $row = $stmt->fetch(PDO::FETCH_OBJ);
 
-        if ($stmt->rowCount() > 0) {
-            return $row;
-        } else {
-            return false;
+            if ($stmt->rowCount() > 0) {
+                return $row;
+            } else {
+                return false;
+            }
+
+        } catch (PDOException $e) {
+            echo $e->getMessage();
         }
+        
     }
 
     public function get_user_and_pics($id){
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare('SELECT u.id, u.username, u.email, u.profile_img, i.user_id, i.img_name 
-                            FROM users u JOIN images i ON u.id = i.user_id WHERE u.id = :id');
-        $stmt->bindValue(':id', $id);
-        $stmt->execute();
+            $stmt = $db->prepare('SELECT u.id, u.username, u.email, u.profile_img, i.user_id, i.img_name 
+                                FROM users u JOIN images i ON u.id = i.user_id WHERE u.id = :id');
+            $stmt->bindValue(':id', $id);
+            $stmt->execute();
 
-        
+            $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
 
+            if ($stmt->rowCount() > 0) {      
+                return $rows;
+            } else {   
+                return false;
+            }
 
-        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        if ($stmt->rowCount() > 0) {      
-            return $rows;
-        } else {   
-            return false;
-        }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }      
 
     }
 
@@ -141,7 +176,7 @@ class User extends \Core\DB {
                             FROM users u 
                                 JOIN images i ON i.user_id = u.id 
                                     WHERE i.user_id = :id 
-                                        GROUP BY u.username');  // probati bez group by; ionako se dohvaća samo jedan rezultat preko $id-a
+                                        GROUP BY u.username'); 
         $stmt->bindValue(':id', $id);
         $stmt->execute();
 
@@ -158,76 +193,111 @@ class User extends \Core\DB {
 
     public function update($data){
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare('UPDATE users SET username = :username, email = :email, profile_img = :profile_img WHERE id = :id');
-        $stmt->bindValue(':username', $data['username']);
-        $stmt->bindValue(':email', $data['email']);
-        $stmt->bindValue(':profile_img', $data['profile_img']);
-        $stmt->bindValue(':id', $data['id']);
-        $stmt->execute();
+            $stmt = $db->prepare('UPDATE users SET username = :username, email = :email, profile_img = :profile_img WHERE id = :id');
+            $stmt->bindValue(':username', $data['username']);
+            $stmt->bindValue(':email', $data['email']);
+            $stmt->bindValue(':profile_img', $data['profile_img']);
+            $stmt->bindValue(':id', $data['id']);
+            $stmt->execute();
 
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        
     }
 
     public function insert_token($email, $token){
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare('UPDATE users SET token = :token, token_expires = DATE_ADD(NOW(), INTERVAL 5 MINUTE) WHERE email = :email');
-        $stmt->bindValue(':token', $token);
-        //$this->db->bind(':token_expires', DATE_ADD(NOW(), INTERVAL 5 MINUTE));
-        $stmt->bindValue(':email', $email);
-        $stmt->execute();
+            $stmt = $db->prepare('UPDATE users SET token = :token, token_expires = DATE_ADD(NOW(), INTERVAL 5 MINUTE) WHERE email = :email');
+            $stmt->bindValue(':token', $token);
+            //$this->db->bind(':token_expires', DATE_ADD(NOW(), INTERVAL 5 MINUTE));
+            $stmt->bindValue(':email', $email);
+            $stmt->execute();
+
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }        
 
     }
 
     public function delete_token($email, $token){
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare("UPDATE users SET token = '' WHERE email = :email");
-        $stmt->bindValue(':email', $email);
-        $stmt->execute();
+            $stmt = $db->prepare("UPDATE users SET token = '' WHERE email = :email");
+            $stmt->bindValue(':email', $email);
+            $stmt->execute();
+
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }       
         
     }
 
     public function find_by_email_and_token($email, $token){
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare("SELECT * FROM users WHERE email = :email AND token = :token AND token != '' AND token_expires > NOW()");
-        $stmt->bindValue(':email', $email);
-        $stmt->bindValue(':token', $token);
-        $stmt->execute();
+            $stmt = $db->prepare("SELECT * FROM users WHERE email = :email AND token = :token AND token != '' AND token_expires > NOW()");
+            $stmt->bindValue(':email', $email);
+            $stmt->bindValue(':token', $token);
+            $stmt->execute();
 
-        $row = $stmt->fetch(PDO::FETCH_OBJ);
+            $row = $stmt->fetch(PDO::FETCH_OBJ);
 
-        if ($stmt->rowCount() > 0) {    
-            return true;         
-        } else {
-            return false;
+            if ($stmt->rowCount() > 0) {    
+                return true;         
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
         }
-
+        
     }
 
     public function update_password($data){ 
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare("UPDATE users SET password = :password, token = '' WHERE email = :email");
-        $stmt->bindValue(':password', $data['password']);
-        $stmt->bindValue(':email', $data['email']);
-        $stmt->execute();
+            $stmt = $db->prepare("UPDATE users SET password = :password, token = '' WHERE email = :email");
+            $stmt->bindValue(':password', $data['password']);
+            $stmt->bindValue(':email', $data['email']);
+            $stmt->execute();
+
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }       
 
     }
 
     public function delete_profile($id){
 
-        $db = static::getDB();
+        try {
+            
+            $db = static::getDB();
 
-        $stmt = $db->prepare('DELETE FROM users WHERE id = :id');
-        $stmt->bindValue(':id', $id);
-        $stmt->execute();
+            $stmt = $db->prepare('DELETE FROM users WHERE id = :id');
+            $stmt->bindValue(':id', $id);
+            $stmt->execute();
+
+        } catch (\Throwable $th) {
+            echo $e->getMessage();
+        }    
 
     }
 

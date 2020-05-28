@@ -14,8 +14,6 @@ class Home extends \Core\Controller {
 
         $pics = Pic::getAll();
 
-        print_r($_SESSION);
-
         View::render('Home/index', [
             'pics' => $pics
         ]);

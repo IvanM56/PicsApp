@@ -6,9 +6,9 @@ use \Core\View;
 use App\Models\User;
 use App\Helpers\CsrfToken;
 use App\Config;
-use PHPMailer\PHPMailer;
-use PHPMailer\Exception;
-use PHPMailer\SMTP; 
+use Vendor\PHPMailer\PHPMailer;
+use Vendor\PHPMailer\Exception;
+use Vendor\PHPMailer\SMTP; 
 use App\Helpers\Redirect;
 use App\Helpers\Session;
 use App\Helpers\RandomString;
@@ -327,8 +327,8 @@ class Users extends \Core\Controller {
                 
                         click on the link below to reset your password.<br><br>
 
-                        <a href='http://localhost:8080/mvc_udemy_picsapp/users/reset-password?email=$email&token=$token'>
-                        http://localhost:8080/mvc_udemy_picsapp/users/reset-password?email=$email&token=$token</a><br><br>
+                        <a href='http://localhost:8080/picsapp_mvc/users/reset-password?email=$email&token=$token'>
+                        http://localhost:8080/picsapp_mvc/users/reset-password?email=$email&token=$token</a><br><br>
 
                         Regards,<br> 
                         PicApp
@@ -437,7 +437,7 @@ class Users extends \Core\Controller {
                     unset($_COOKIE['email']);
                     unset($_COOKIE['token']);
 
-                    Recirect::to('users/login');
+                    Redirect::to('users/login');
 
                 } else {
 
