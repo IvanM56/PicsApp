@@ -1,4 +1,4 @@
 # Pics&Docs
 
-![](Public/img/picsapp.png)
+![](public/img/picsapp.png)
 
