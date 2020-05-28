@@ -21,7 +21,7 @@ class User extends \Core\DB {
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
-        
+
     }
 
  

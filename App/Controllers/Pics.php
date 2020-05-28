@@ -17,10 +17,11 @@ class Pics extends \Core\Controller {
 
     public function index(){
 
-        echo 'Hello from Pics controller';
-        echo '<p>Route parameters: <pre>' .
-                htmlspecialchars(print_r($this->route_params, true)) . '</pre></p>';
-                echo $this->route_params['id'];
+        $pics = Pic::getAll();
+
+        View::render('Pics/index', [
+            'pics' => $pics
+        ]);
 
     }
 
@@ -93,7 +94,7 @@ class Pics extends \Core\Controller {
 
                         Pic::add_pic(Session::get('id'), $new_name);
     
-                        Redirect::to('home');
+                        Redirect::to('pics/index');
     
                     } else {
                         Redirect::to('home');
@@ -228,7 +229,7 @@ class Pics extends \Core\Controller {
                 // Delete from database
                 Pic::delete_pic($id, Session::get('id'));
                 
-                Redirect::to('home');
+                Redirect::to('pics/index');
 
             }
         }

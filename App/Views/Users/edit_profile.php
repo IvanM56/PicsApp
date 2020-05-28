@@ -1,14 +1,14 @@
 <?php 
 
-require '../app/views/layouts/header.php'; 
+require '../App/Views/Layouts/header.php'; 
 require '../App/Views/Users/delete_profile_modal.php';
 
 use App\Config;
 
 ?>
 
-<div class="row">
-  <div class="col-md-12 ml-5">
+<div class="row justify-content-center">
+  <div class="col-md-4">
     <div class="card card-body bg-light mt-5">
         <h2>Change your data</h2><br>
         <div class="media">
@@ -33,7 +33,7 @@ use App\Config;
                 <?php echo(!empty($data['email_error'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['email']; ?>">
                 <span class="invalid-feedback"><?php echo $data['email_error']; ?></span>
             </div>
-            <div class="row mt-4">
+            <div class="row mt-4 mb-3">
                 <div class="col">
                     <input type="submit" name="submit" value="Update" class="btn btn-success btn-block">
                 </div>

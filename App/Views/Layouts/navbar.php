@@ -7,15 +7,14 @@ use App\Helpers\Session;
 
 ?>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-info">
-    <a class="navbar-brand ml-3" href="<?php echo Config::ROOTURL; ?>">PicsApp</a>
+<nav class="navbar navbar-custom navbar-expand-lg navbar-dark sticky-top bg-info">
+    <a class="navbar-brand ml-4" href="<?php echo Config::ROOTURL; ?>">PicsApp</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span> 
     </button>
     <!-- Left side of the navbar -->
-    <div class="container">
     <div class="collapse navbar-collapse" id="navbarNav"> 
-      <ul class="navbar-nav mr-auto">
+      <ul class="navbar-nav mr-auto ml-5">
         <li class="nav-item">
           <a class="nav-link" href="<?php echo Config::ROOTURL; ?>">Home <span class="sr-only">(current)</span></a>
         </li>
@@ -24,7 +23,7 @@ use App\Helpers\Session;
         </li>
       </ul>
     <!-- Right side of the navbar -->
-      <ul class="navbar-nav ml-auto">
+      <ul class="navbar-nav ml-auto mr-5 pr-5">
       <?php if(!Session::exists('id')) : ?>
         <li class="nav-item">
           <a class="nav-link" href="<?php echo Config::ROOTURL; ?>users/register">Register</a>
@@ -54,8 +53,9 @@ use App\Helpers\Session;
       <?php endif; ?>
       </ul>  
     </div>
-  </div>
 </nav>
+
+
 
 
 

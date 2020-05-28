@@ -1,14 +1,14 @@
 <?php 
 
-require '../app/views/layouts/header.php';
+require '../App/Views/Layouts/Header.php';
 
 use App\Config; 
 
 ?>
 
 
-<div class="row">
-  <div class="col-md-12 ml-5">
+<div class="row justify-content-center">
+  <div class="col-md-4">
     <div class="card card-body bg-light mt-5">
         <h2>Login</h2>
         <p>Please fill in your credentials to log in</p>

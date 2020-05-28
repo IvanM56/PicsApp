@@ -5,6 +5,7 @@ require '../App/Views/Pics/remove_pic_modal.php';
 
 use App\Config;
 use App\Controllers\Users;
+use App\Helpers\Session;
 
 ?>
 
@@ -21,7 +22,7 @@ use App\Controllers\Users;
                 <small>Uploaded at: <?php echo date_format(new DateTime($pic->uploaded_at), 'd/m/Y'); ?></small><br>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                 <?php 
-                    if(Users::loggedIn() && $pic->user_id == $_SESSION['id']): 
+                    if(Users::loggedIn() && $pic->user_id == Session::get('id')): 
                 ?>
                     <a href="#" id="removePic" class="btn btn-danger" data-id="<?php echo $pic->id; ?>" data-toggle="modal" data-target="#remove-pic-modal">Remove</a>
                 <?php else: ?>

@@ -7,8 +7,8 @@ use App\Config;
 ?>
 
 
-<div class="row">
-  <div class="col-md-12 ml-5">
+<div class="row justify-content-center">
+  <div class="col-md-4">
     <div class="card card-body bg-light mt-5">
         <h2>Reset your password</h2><br>
         <form action="<?php echo Config::ROOTURL; ?>users/send-email" method="POST">
