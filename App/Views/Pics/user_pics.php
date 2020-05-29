@@ -9,12 +9,12 @@ use App\Helpers\Session;
 
 ?>
 
-<div class='ml-4 mt-3'>
+<div class='ml-4 mt-5'>
     <h4>Pics by <?php echo $data['pics'][0]->username; ?></h4>
 </div>
 
-<?php foreach ($data['pics'] as $key => $pic): ?>
-   
+<!-- <div class="row">
+    <?php foreach ($data['pics'] as $key => $pic): ?>
     <div class="ml-4 mt-5">
         <div class="card" style="width: 18rem;">
         <a href="../../public/img/<?php echo $pic->img_name; ?>"><img class="card-img-top" src="../../public/img/<?php echo $pic->img_name; ?>" alt="Card image cap"></a>
@@ -31,15 +31,34 @@ use App\Helpers\Session;
             </div>
         </div>
     </div>
-        
+    <?php endforeach; ?>
+</div>  -->
+
+<div class="row">
+    <?php foreach ($data['pics'] as $key => $pic): ?>
+    <div class="custompic col-md-4 mt-5">
+        <figure class="figure">
+        <a href="../../public/img/<?php echo $pic->img_name ?>"><img src="../../public/img/<?php echo $pic->img_name ?>" class="figure-img img-fluid z-depth-1"
+            alt="..." style="width: 400px"></a>
+        <figcaption class="figure-caption">Uploaded at: <?php echo date_format(new DateTime($pic->uploaded_at), 'd/m/Y'); ?> </figcaption>
+        </figure>
+        <div class="row">
+            <?php if(Users::loggedIn() && $pic->user_id == Session::get('id')): ?>
+            <div class="ml-3">
+                <a href="#" id="removePic" class="btn btn-danger" data-id="<?php echo $pic->id; ?>" data-toggle="modal" data-target="#remove-pic-modal">Remove</a>
+            </div>
+            <?php else: ?>
+            <div class="ml-3">
+                <a href="#" class="btn btn-info">Can't remove</a>
+            </div>
+            <?php endif; ?>       
+        </div>
+    </div>
+    <?php endforeach; ?>
+</div>
+
    
-<?php 
-
-endforeach; 
-
-require '../app/views/layouts/footer.php'; 
-
-?>
+<?php require '../app/views/layouts/footer.php'; ?>
 
 
 

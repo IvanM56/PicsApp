@@ -28,7 +28,7 @@ use App\Helpers\Session;
                 <a href="#" class="btn btn-info">Can't remove</a>
             </div>
             <?php endif; ?>  
-            <div class="ml-auto mr-5 pr-4">
+            <div class="ml-auto mr-5 pt-2 pr-5">
                 <a href="<?php echo Config::ROOTURL; ?>users/profile/<?php echo $pic->user_id ?>">
                 <img class="rounded-circle" style="float:right" src="../img/profile_pics/<?php echo $pic->profile_img; ?>" width="40" height="40"></a>
             </div>     

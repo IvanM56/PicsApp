@@ -35,7 +35,7 @@ use App\Config;
             </div>
             <div class="row mt-4 mb-3">
                 <div class="col">
-                    <input type="submit" name="submit" value="Update" class="btn btn-success btn-block">
+                    <input type="submit" name="submit" value="Update" class="btn btn-success">
                 </div>
                 <div class="col">
                     <a href="#" id="delProfile" class="btn btn-danger float-right" data-id="<?php echo $data['id']; ?>" 

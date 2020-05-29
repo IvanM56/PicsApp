@@ -9,7 +9,7 @@ use App\Config;
 
 
 <div class="row justify-content-center">
-  <div class="col-md-4">
+  <div class="col-md-6">
     <div class="card card-body bg-light mt-5">
         <h2>Create an account</h2>
         <p>Please fill out this form to register with us</p>
@@ -50,10 +50,10 @@ use App\Config;
 
             <div class="row">
                 <div class="col">
-                    <input type="submit" name="submit" value="Register" class="btn btn-success btn-block">
+                    <input type="submit" name="submit" value="Register" class="btn btn-success">
                 </div>
                 <div class="col">
-                    <a href="<?php echo Config::ROOTURL; ?>users/login" class="btn btn-light btn-block">Already have an account? Login!</a>
+                    <a href="<?php echo Config::ROOTURL; ?>users/login" class="btn btn-light">Already have an account? Login!</a>
                 </div>
             </div>
         </form>

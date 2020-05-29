@@ -8,7 +8,7 @@ use App\Config;
 
 
 <div class="row justify-content-center">
-  <div class="col-md-4">
+  <div class="col-md-6">
     <div class="card card-body bg-light mt-5">
         <h2>Login</h2>
         <p>Please fill in your credentials to log in</p>
@@ -32,15 +32,15 @@ use App\Config;
             </div><br>
             <div class="row">
                 <div class="col">
-                    <input type="submit" name="submit" value="Login" class="btn btn-success btn-block">
+                    <input type="submit" name="submit" value="Login" class="btn btn-success">
                 </div>
                 <div class="col">
-                    <a href="<?php echo Config::ROOTURL; ?>users/register" class="btn btn-light btn-block">Need an account? Well, register!</a>
+                    <a href="<?php echo Config::ROOTURL; ?>users/register" class="btn btn-light">Need an account? Well, register!</a>
                 </div>
             </div><br>
         </form>   
-            <div class="form-group">
-                <small class="text-muted ml-2">
+            <div class="form-group mr-4 pr-2">
+                <small class="text-muted">
                     <a href="<?php echo Config::ROOTURL; ?>users/send-email" style="float:right">Forgot Password?</a>
                 </small>
             </div>
