@@ -4,6 +4,7 @@
 require '../App/Views/Layouts/header.php'; 
 
 use App\Config;
+use App\Helpers\Validation;
 
 ?>
 
@@ -26,26 +27,26 @@ use App\Config;
             <div class="form-group">
                 <label for="username">Userame: <sup>*</sup></label>
                 <input type="text" name="username" class="form-control form-control-lg 
-                <?php echo (!empty($data['username_error'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['username']; ?>">
-                <span class="invalid-feedback"><?php echo $data['username_error']; ?></span>
+                <?php echo Validation::hasError('username') ? 'is-invalid' : '' ?>" value="<?php echo $data['username']; ?>">
+                <span class="invalid-feedback"><?php echo Validation::hasError('username'); ?></span>
             </div>
             <div class="form-group">
                 <label for="email">Email: <sup>*</sup></label>
                 <input type="email" name="email" class="form-control form-control-lg 
-                <?php echo (!empty($data['email_error'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['email']; ?>">
-                <span class="invalid-feedback"><?php echo $data['email_error']; ?></span>
+                <?php echo Validation::hasError('email') ? 'is-invalid' : ''; ?>" value="<?php echo $data['email']; ?>">
+                <span class="invalid-feedback"><?php echo Validation::hasError('email'); ?></span>
             </div>
             <div class="form-group">
                 <label for="password">Password: <sup>*</sup></label>
                 <input type="password" name="password" class="form-control form-control-lg 
-                <?php echo (!empty($data['password_error'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['password']; ?>">
-                <span class="invalid-feedback"><?php echo $data['password_error']; ?></span>
+                <?php echo Validation::hasError('password') ? 'is-invalid' : ''; ?>" value="<?php echo $data['password']; ?>">
+                <span class="invalid-feedback"><?php echo Validation::hasError('password'); ?></span>
             </div>
             <div class="form-group">
                 <label for="confirm_password">Confirm password: <sup>*</sup></label>
                 <input type="password" name="confirm_password" class="form-control form-control-lg 
-                <?php echo(!empty($data['confirm_password_error'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['confirm_password']; ?>">
-                <span class="invalid-feedback"><?php echo $data['confirm_password_error']; ?></span>
+                <?php echo Validation::hasError('confirm_password') ? 'is-invalid' : ''; ?>" value="<?php echo $data['confirm_password']; ?>">
+                <span class="invalid-feedback"><?php echo Validation::hasError('confirm_password'); ?></span>
             </div>
 
             <div class="row">

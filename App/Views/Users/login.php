@@ -3,6 +3,7 @@
 require '../App/Views/Layouts/Header.php';
 
 use App\Config; 
+use App\Helpers\Validation;
 
 ?>
 
@@ -11,21 +12,24 @@ use App\Config;
   <div class="col-md-6">
     <div class="card card-body bg-light mt-5">
         <h2>Login</h2>
-        <p>Please fill in your credentials to log in</p>
+        <p>Please fill in your credentials to log in</p><br>
         <form action="<?php echo Config::ROOTURL; ?>users/login" method="POST">
             <input type="hidden" name="csrf_token" value="<?php echo $data['csrf_token']; ?>">
             <div class="form-group">
                 <label for="email">Email: <sup>*</sup></label>
                 <input type="email" name="email" class="form-control form-control-lg 
-                <?php echo (!empty($data['email_error'])) ? 'is-invalid' : ''; ?>" value="<?php echo (isset($_COOKIE['email'])) ? $_COOKIE['email'] : $data['email']; ?>" >
-                <span class="invalid-feedback"><?php echo $data['email_error']; ?></span>
+                <?php echo Validation::hasError('email') ? 'is-invalid' : ''; ?>" value="<?php echo (isset($_COOKIE['email'])) ? $_COOKIE['email'] : $data['email']; ?>" >
+                <span class="invalid-feedback"><?php echo Validation::hasError('email'); ?></span>
             </div>
             <div class="form-group">
                 <label for="password">Password: <sup>*</sup></label>
                 <input type="password" name="password" class="form-control form-control-lg 
-                <?php echo (!empty($data['password_error'])) ? 'is-invalid' : ''; ?>" value="<?php echo (isset($_COOKIE['password'])) ? $_COOKIE['password'] : $data['password']; ?>">
-                <span class="invalid-feedback"><?php echo $data['password_error']; ?></span>
-            </div><br>
+                <?php echo Validation::hasError('password') ? 'is-invalid' : ''; ?>" value="<?php echo (isset($_COOKIE['password'])) ? $_COOKIE['password'] : $data['password']; ?>">
+                <span class="invalid-feedback"><?php echo Validation::hasError('password'); ?></span>
+            </div>
+            <div>
+                <p class="text-danger"><?php echo (!empty($data['login_error'])) ? $data['login_error'] : ''; ?></p>
+            </div>
             <div class="form-group form-check">
                 <input type="checkbox" class="form-check-input" id="remember" name="remember" <?php echo (isset($_COOKIE['password'])) ? 'checked' : ''; ?> >
                 <label class="form-check-label" for="remember">Remember me</label>

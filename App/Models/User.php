@@ -92,7 +92,7 @@ class User extends \Core\DB {
         
     }
 
-    public static function login($data){
+    public static function login($data){ 
 
         try {
             

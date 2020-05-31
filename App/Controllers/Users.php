@@ -12,6 +12,7 @@ use Vendor\PHPMailer\SMTP;
 use App\Helpers\Redirect;
 use App\Helpers\Session;
 use App\Helpers\RandomString;
+use App\Helpers\Validation;
 
 
 class Users extends \Core\Controller {
@@ -46,93 +47,54 @@ class Users extends \Core\Controller {
                     'confirm_password' => trim($_POST['confirm_password']),
                     'profile_img' => $profile_img,
                     'csrf_token' => CsrfToken::create(),
-                    'username_error' => '',
-                    'email_error' => '',
-                    'password_error' => '',
-                    'confirm_password_error' => '',
                     'profile_img_error' => ''
                 
                 ];
 
+                Validation::check([
 
-                if (empty($data['username'])) {
-                    
-                    $data['username_error'] = 'Please enter your username';
-                
-                } else {
+                    'username' => [
+                        'required' => true,
+                        'unique' => true,
+                        'min' => 2,
+                        'max' => 25
+                    ],
+                    'email' => [
+                        'required' => true,
+                        'unique' => true,
+                    ],
+                    'password' => [
+                        'required' => true,
+                        'min' => 7
+                    ],
+                    'confirm_password' => [
+                        'required' => true,
+                        'matches' => 'password'
+                    ],
 
-                    if(User::find_by_username($data['username'])){
-
-                        $data['username_error'] = 'This username is already taken';
-
-                    }   
-
-                }
-                
-                if (empty($data['email'])) {
-                    
-                    $data['email_error'] = 'Please enter your email';
-
-                } else {
-
-                    if(User::find_by_email($data['email'])){
-
-                        $data['email_error'] = 'This email is already in use!';
-
-                    }
-                }
-                
-                if (empty($data['password'])) {
-                    
-                    $data['password_error'] = 'Please enter your password';
-                    
-                } else {
-
-                    if (strlen($data['password']) < 7){
-
-                        $data['password_error'] = 'Password must be at least 7 characters long';
-
-                    }
-                }
-                
-                if (empty($data['confirm_password'])) {
-                    
-                    $data['confirm_password_error'] = 'Please confirm your password';
-                    
-                } else {
-            
-                    if ($data['confirm_password'] != $data['password']) {
-                        
-                        $data['confirm_password_error'] = 'Passwords don\'t match!';
-            
-                    }
-                }
-                
+                ]); 
+             
                 if (!$profile_img) {
 
                     $data['profile_img_error'] = 'Choose only .jpg or .png format!';
 
                 }
-                
-                if (empty($data['username_error']) && empty($data['email_error']) && empty($data['password_error']) 
-                    && empty($data['confirm_password_error']) && empty($data['profile_img_error'])) {
-                    
-                    $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 
+                if (Validation::passed()) {
+
+                    $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
                     User::register($data);
-                
                     $_SESSION['profile_img'] = $profile_img;
 
                     Redirect::to('users/login');
-                
+
                 } else {
-                
+
                     View::render('users/register', [
                         'data' => $data
                     ]);
-                    
-                }
 
+                }
             } 
                
         } else {
@@ -144,10 +106,6 @@ class Users extends \Core\Controller {
                 'password' => '',
                 'confirm_password' => '',
                 'csrf_token' => CsrfToken::create(),
-                'username_error' => '',
-                'email_error' => '',
-                'password_error' => '',
-                'confirm_password_error' => ''
             
             ];
 
@@ -174,41 +132,25 @@ class Users extends \Core\Controller {
                     'email' => trim($_POST['email']),
                     'password' => trim($_POST['password']),
                     'csrf_token' => CsrfToken::create(),
-                    'email_error' => '',
-                    'password_error' => ''
                 
                 ];
                 
-                if (empty($data['email'])) {
-                    
-                    $data['email_error'] = 'Please enter your email';
-                    
-                } else {
+                Validation::check([
 
-                    if(User::find_by_email($data['email'])){
+                    'email' => [
+                        'required' => true,
+                        'exists' => true
+                    ],
+                    'password' => [
+                        'required' => true
+                    ]
 
-                        // mail je u bazi, user se može ulogirati
+                ]); 
 
-                    } else {
-
-                        $data['email_error'] = 'Can\'t find this email in database!';
-
-                    }
-                    
-                    
-                }
-                
-                if (empty($data['password'])) {
-                    
-                    $data['password_error'] = 'Please enter your password';
-                    
-                }
-                
-                
-                if (empty($data['email_error']) && empty($data['password_error'])) {
+                if (Validation::passed()) {
                     
                     $user = User::login($data);
-                
+
                     if($user){
 
                         if (isset($_POST['remember'])) {
@@ -241,19 +183,20 @@ class Users extends \Core\Controller {
 
                     } else {
 
-                        $data['password_error'] = 'You have entered wrong password!';
+                        $data['login_error'] = 'Wrong password! Login failed!';
                         View::render('users/login', [
                             'data' => $data
                         ]);
 
                     }
-                
+                    
                 } else {
-                
+
+                    $data['password_error'] = 'You have entered wrong password!';
                     View::render('users/login', [
                         'data' => $data
                     ]);
-                    
+
                 }
 
             }
@@ -264,9 +207,7 @@ class Users extends \Core\Controller {
         
                 'email' => '',
                 'password' => '',
-                'csrf_token' => CsrfToken::create(),
-                'email_error' => '',
-                'password_error' => '',
+                'csrf_token' => CsrfToken::create()
             
             ];
             
@@ -351,7 +292,7 @@ class Users extends \Core\Controller {
     
                 } else {
     
-                    $data['email_msg'] = 'Can\'t find this email in the base!';
+                    $data['email_error'] = 'Can\'t find this email in the base!';
 
                     View::render('users/send_email', [
                         'data' => $data
@@ -402,38 +343,24 @@ class Users extends \Core\Controller {
 
                 ];
 
-                if (empty($data['password'])) {
-                
-                    $data['password_error'] = 'Please enter your password';
+                Validation::check([
+
+                    'password' => [
+                        'required' => true,
+                        'min' => 7
+                    ],
+                    'confirm_password' => [
+                        'required' => true,
+                        'matches' => 'password'
+                    ],
+
+                ]); 
+
+                if (Validation::passed()) {
                     
-                } else {
-    
-                    if (strlen($data['password']) < 7){
-    
-                        $data['password_error'] = 'Password must be at least 7 characters long';
-    
-                    }
-                }
-
-                if (empty($data['confirm_password'])) {
-                
-                    $data['confirm_password_error'] = 'Please confirm your password';
-                    
-                } else {
-
-                    if($data['password'] != $data['confirm_password']){
-
-                        $data['confirm_password_error'] = 'Passwords don\'t match!';
-
-                    }
-                }
-
-                if(empty($data['password_error']) && empty($data['confirm_password_error'])){
-
                     $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+                    User::update_password($data);
 
-                    User::update_password($data);  
-                
                     unset($_COOKIE['email']);
                     unset($_COOKIE['token']);
 
