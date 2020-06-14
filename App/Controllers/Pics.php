@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use \Core\View;
+use App\Auth;
 use App\Models\Pic;
 use App\Controllers\Users;
 use App\Helpers\Redirect;
@@ -46,7 +47,7 @@ class Pics extends \Core\Controller {
 
    public function addPic(){
 
-        if(Users::loggedIn()){
+        if(Auth::loggedIn()){
 
             if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 

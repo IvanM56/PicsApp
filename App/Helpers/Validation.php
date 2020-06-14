@@ -47,6 +47,23 @@ class Validation {
                                 }
                             }
                             break;
+                        case 'current':
+                            if ($input === 'username') {
+                                $username = User::find_by_username($user_input);
+                                if ($username == $user_input) {
+                                    // Pass
+                                } else {
+                                    self::addError($input, 'This username is already taken');
+                                }
+                            } else if ($input === 'email'){
+                                $email = User::find_by_email($user_input);
+                                if ($email == $user_input) {
+                                    // Pass
+                                } else {
+                                    self::addError($input, 'This email is already in use');
+                                }
+                            }
+                            break;
                         case 'exists':
                             if ($input === 'email') {
                                 $email = User::find_by_email($user_input);

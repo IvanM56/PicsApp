@@ -11,11 +11,13 @@ class Redirect {
 
         if($url === 'home'){
     
-            header('Location: '. Config::ROOTURL);
+            header('Location: '. Config::ROOTURL, true, 303);
+            exit;
     
         } else {
     
-            header('Location: '. Config::ROOTURL . $url);
+            header('Location: '. Config::ROOTURL . $url, true, 303);
+            exit;
     
         }
       

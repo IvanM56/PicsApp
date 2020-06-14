@@ -63,7 +63,7 @@ class Pic extends \Core\DB {
 
     }
 
-    public function add_pic($user_id, $img_name){
+    public function add_pic($user_id, $img_name){ 
 
         try {
             

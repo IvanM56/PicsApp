@@ -14,7 +14,7 @@ class CsrfToken {
 
         $token = RandomString::create();
 
-        $_SESSION['csrf_token'] = $token;
+        Session::set('csrf_token', $token);
 
         return $token;
 

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use PDO;
+use App\Helpers\RandomString;
+use App\Config;
 
 
 class User extends \Core\DB {
@@ -62,7 +64,8 @@ class User extends \Core\DB {
             $row = $stmt->fetch(PDO::FETCH_OBJ);
 
             if ($row) {
-                return true;
+                // return true;
+                return $row;
             } else {
                 return false;    
             }
@@ -86,36 +89,41 @@ class User extends \Core\DB {
             $stmt->bindValue(':profile_img', $data['profile_img']);
             $stmt->execute();
 
-        } catch (PDOExceptio $e) {
+        } catch (PDOException $e) {
             echo $e->getMessage();
         }
         
     }
 
-    public static function login($data){ 
+    public static function authenticate($email, $password){
 
-        try {
+        $user = self::find_by_email($email);
+
+        if ($user) {
             
-            $db = static::getDB();
+            $hashpass = $user->password;
 
-            $stmt = $db->prepare('SELECT * FROM users WHERE email = :email');
-            $stmt->bindValue(':email', $data['email']);
-            $stmt->execute();
+            if (password_verify($password, $hashpass)) {
+                
+                return $user;
 
-            $row = $stmt->fetch(PDO::FETCH_OBJ);
-
-            $hashpass = $row->password;
-
-            if (password_verify($data['password'], $hashpass)){
-                return $row;
-            } else {
-                return false;
             }
+        }
 
-        } catch (PDOException $e) {
-            echo $e->getMessage();
-        }       
-        
+        return false;
+
+    }
+
+    public static function rememberLogin($token_hash, $user_id, $expires_at){
+
+        $db = static::getDB();
+
+        $stmt = $db->prepare('INSERT INTO remember (token_hash, user_id, expires_at) VALUES (:token, :id, :expires_at)');
+        $stmt->bindValue(':token', $token_hash, PDO::PARAM_STR);
+        $stmt->bindValue(':id', $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(':expires_at', date('Y-m-d H:i:s', $expires_at), PDO::PARAM_STR);
+        $stmt->execute();
+
     }
 
 

@@ -28,5 +28,15 @@ CREATE TABLE IF NOT EXISTS `images` (
     -- FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
 )ENGINE = InnoDB;
 
+DROP TABLE IF EXISTS `remember`;
+CREATE TABLE IF NOT EXISTS `remember` (
+    `token_hash` varchar(64) NOT NULL,
+    `user_id` int(10) UNSIGNED NOT NULL,
+    `expires_at` datetime NOT NULL,
+    PRIMARY KEY (`token_hash`)
+    -- FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+)ENGINE = InnoDB;
+
 
 ALTER TABLE `images` ADD FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `remember` ADD FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

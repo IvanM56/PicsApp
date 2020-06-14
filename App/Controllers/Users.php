@@ -4,8 +4,10 @@ namespace App\Controllers;
 
 use \Core\View;
 use App\Models\User;
+use App\Models\Remember;
 use App\Helpers\CsrfToken;
 use App\Config;
+use App\Auth;
 use Vendor\PHPMailer\PHPMailer;
 use Vendor\PHPMailer\Exception;
 use Vendor\PHPMailer\SMTP; 
@@ -13,6 +15,7 @@ use App\Helpers\Redirect;
 use App\Helpers\Session;
 use App\Helpers\RandomString;
 use App\Helpers\Validation;
+use App\Helpers\RememberMeToken;
 
 
 class Users extends \Core\Controller {
@@ -84,7 +87,7 @@ class Users extends \Core\Controller {
 
                     $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
                     User::register($data);
-                    $_SESSION['profile_img'] = $profile_img;
+                    Session::set('profile_img', $profile_img);
 
                     Redirect::to('users/login');
 
@@ -124,13 +127,13 @@ class Users extends \Core\Controller {
             
             if (CsrfToken::check($_POST['csrf_token'])){
 
-
                 $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
                 
                 $data = [
             
                     'email' => trim($_POST['email']),
                     'password' => trim($_POST['password']),
+                    'remember' => $_POST['remember'],
                     'csrf_token' => CsrfToken::create(),
                 
                 ];
@@ -148,36 +151,13 @@ class Users extends \Core\Controller {
                 ]); 
 
                 if (Validation::passed()) {
-                    
-                    $user = User::login($data);
+
+                    $user = User::authenticate($data['email'], $data['password']);
+                    $remember = $data['remember'];
 
                     if($user){
 
-                        if (isset($_POST['remember'])) {
-                            
-                            setcookie('email', $data['email'], time() + (86400 * 30));
-                            setcookie('password', $data['password'], time() + (86400 * 30));
-
-                        } else {
-                            
-                            if (isset($_COOKIE['email'])) {
-                                
-                                setcookie('email', '');
-
-                            }
-
-                            if (isset($_COOKIE['password'])) {
-                                
-                                setcookie('password', '');
-                                
-                            }
-                        
-                        }
-
-                        Session::set('id', $user->id);
-                        Session::set('email', $user->email);
-                        Session::set('username', $user->username);
-                        Session::set('profile_img', $user->profile_img);
+                        Auth::login($user, $remember);
 
                         Redirect::to('home');
 
@@ -207,6 +187,7 @@ class Users extends \Core\Controller {
         
                 'email' => '',
                 'password' => '',
+                'remember' => '',
                 'csrf_token' => CsrfToken::create()
             
             ];
@@ -469,8 +450,22 @@ class Users extends \Core\Controller {
     
                 ];
     
+                Validation::check([
+
+                    'username' => [
+                        'required' => true,
+                        'current' => true,
+                        'min' => 2,
+                        'max' => 25
+                    ],
+                    'email' => [
+                        'required' => true,
+                        'current' => true,
+                    ]
+
+                ]); 
     
-                if (empty($data['username'])) {
+                /* if (empty($data['username'])) {
             
                     $data['username_error'] = 'Enter your new username';
     
@@ -497,7 +492,7 @@ class Users extends \Core\Controller {
     
                     }
                     
-                }
+                } */
 
                 if (!$profile_img) {
                     
@@ -505,7 +500,7 @@ class Users extends \Core\Controller {
 
                 } 
     
-                if (empty($data['username_error']) && empty($data['email_error']) && empty($data['profile_img_error'])) {
+                /* if (empty($data['username_error']) && empty($data['email_error']) && empty($data['profile_img_error'])) {
                     
                     User::update($data);
 
@@ -520,7 +515,7 @@ class Users extends \Core\Controller {
                         'data' => $data
                     ]);
     
-                }
+                } */
 
             }  
 
@@ -593,28 +588,23 @@ class Users extends \Core\Controller {
 
     }
 
-    public static function loggedIn(){
-
-        if (Session::exists('id')) {
-            
-            return true;
-
-        } else {
-
-            return false;
-
-        }
-
-    }
 
     public function logout(){
-    
-        Session::delete('id');
-        Session::delete('email');
-        Session::delete('username');
-    
+
+        $_SESSION = [];
+
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+
         session_destroy();
-    
+
+        Auth::forgetCookieLogin();
+
         Redirect::to('home');
     
     }

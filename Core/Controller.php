@@ -2,8 +2,6 @@
 
 namespace Core;
 
-// neće se izravno instancirati u objekte, zato je abstract
-// bitan je zato da svim controllerima budu dostupni parametri iz url-ova, id-evi konkretno
 // to access route parameters in controllers
 abstract class Controller {
 
@@ -15,29 +13,4 @@ abstract class Controller {
         
     }
 
-
-    // tzv. action filters
-    public function __call($name, $args){
-
-        $method = $name . 'Action';
-
-        if (method_exists($this, $method)) {
-            if ($this->before() !== false) {
-                call_user_func_array([$this, $method], $args);
-                $this->after();
-            }
-        } else {
-            echo "Method $method not found in controler ". get_class($this);
-        }
-
-
-    }
-
-    protected function before(){
-
-    }
-
-    protected function after(){
-        
-    }
 }

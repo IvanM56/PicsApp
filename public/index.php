@@ -2,7 +2,7 @@
 
 // entry point, tzv. front controller
 
-session_start();
+session_start(); 
 
 
 /* AUTOLOAD CLASSES */
@@ -11,7 +11,7 @@ spl_autoload_register(function($class){
     $file = $root. '/' .str_replace('\\', '/', $class). '.php';
 
     if (is_readable($file)) {
-        require $root. '/' .str_replace('\\', '/', $class). '.php';
+        require $file;
     }
 });
 
